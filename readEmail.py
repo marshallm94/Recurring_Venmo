@@ -7,6 +7,7 @@ import email
 from apiclient import errors
 
 from datetime import datetime as dt
+import numpy as np
 
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
 store = file.Storage('token.json')
@@ -61,7 +62,7 @@ def get_query_results(query):
 
     return out
 
-def extract_electric_bill_info(email_id, message):
+def extract_electric_bill_info(email_id, message, bill_name, multiplier=0.5):
 
     # get total bill amount
     try:
@@ -73,11 +74,13 @@ def extract_electric_bill_info(email_id, message):
         value = dt.fromtimestamp(int(subdict['internalDate'])/1000)
         email_date = value.strftime("%Y-%m-%d")
 
-        return total_amount, email_date
+        amount_to_be_charged = np.round(total_amount * multiplier, 2)
+
+        return email_date, total_amount, amount_to_be_charged, bill_name 
     except:
         print(f"Something went wrong with the parsing of email with ID {email_id}")
 
-def extract_xfinity_bill_info(email_id, message):
+def extract_xfinity_bill_info(email_id, message, bill_name, multiplier=0.5):
 
     # get total bill amount
     try:
@@ -89,11 +92,13 @@ def extract_xfinity_bill_info(email_id, message):
         value = dt.fromtimestamp(int(subdict['internalDate'])/1000)
         email_date = value.strftime("%Y-%m-%d")
 
-        return total_amount, email_date
+        amount_to_be_charged = np.round(total_amount * multiplier, 2)
+
+        return email_date, total_amount, amount_to_be_charged, bill_name 
     except:
         print(f"Something went wrong with the parsing of email with ID {email_id}")
 
-def extract_water_bill_info(email_id, message):
+def extract_water_bill_info(email_id, message, bill_name, multiplier=0.5):
 
     # get total bill amount
     try:
@@ -105,11 +110,13 @@ def extract_water_bill_info(email_id, message):
         value = dt.fromtimestamp(int(subdict['internalDate'])/1000)
         email_date = value.strftime("%Y-%m-%d")
 
-        return total_amount, email_date
+        amount_to_be_charged = np.round(total_amount * multiplier, 2)
+
+        return email_date, total_amount, amount_to_be_charged, bill_name 
     except:
         print(f"Something went wrong with the parsing of email with ID {email_id}")
 
-def extract_transaction_info(email_id, message, bill_type):
+def extract_transaction_info(email_id, message, bill_name):
     '''
     Extracts the info necessary for a Venmo request to be sent
     (using the Venmo CLI):
@@ -118,7 +125,7 @@ def extract_transaction_info(email_id, message, bill_type):
     ----------
     message : (dict)
         A dictionary that contains the a key 'snippet' whose value contains
-        all relevant transaction information (date, amount, bil_typ).
+        all relevant transaction information (date, amount, bill_name).
 
     Returns:
     ----------
@@ -126,19 +133,43 @@ def extract_transaction_info(email_id, message, bill_type):
         A dictionary containing with the keys:
             * 'date'
             * 'total_amount'
+            * 'multiplier'
             * 'amount_to_be_charged'
-            * 'payor'
+            * 'bill_name'
     '''
-    if bill_type == 'xfinity':
-        out = extract_xfinity_bill_info(email_id, message)
-    elif bill_type == 'water':
-        out = extract_water_bill_info(email_id, message)
-    elif bill_type == 'electric':
-        out = extract_electric_bill_info(email_id, message)
+    out = {'date': None,
+           'total_amount': None,
+           'amount_to_be_charged': None,
+           'bill_name': None}
 
-    return out
+    try:
+        if bill_name == 'xfinity':
+            bill_info = extract_xfinity_bill_info(email_id, message, bill_name)
+        elif bill_name == 'water':
+            bill_info = extract_water_bill_info(email_id, message, bill_name)
+        elif bill_name == 'electric':
+            bill_info = extract_electric_bill_info(email_id, message, bill_name)
+
+        out['date'] = dt.strptime(bill_info[0], "%Y-%m-%d")
+        out['total_amount'] = bill_info[1]
+        out['amount_to_be_charged'] = bill_info[2]
+        out['bill_name'] = bill_info[3]
+
+        return out
+    except:
+        print(f'Error parsing email with ID = {email_id}')
+
+def create_venmo_request(bill_name, date, amount_to_be_charged, chargee="@Emily-Solem"):
+
+    request_string = f"{bill_name} - {date.strftime('%Y-%m-%d')}"
+    venmo_CLI_string = f"venmo charge {chargee} {amount_to_be_charged} '{request_string}'"
+
+    return venmo_CLI_string
     
 if __name__ == '__main__':
+    with open("last_run_date.txt") as date_file:
+        last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d")
+
     electric_bill_query = 'from:NES subject:Payment Processed'
     water_bill_query = "Metro Water Services AND new bill"
     xfinity_bill_query = 'from:Xfinity subject:Thank you for your recent payment'
@@ -146,8 +177,12 @@ if __name__ == '__main__':
     bills = {'water': water_bill_query,
              'electric': electric_bill_query,
              'xfinity': xfinity_bill_query}
+
     for bill, query in bills.items():
         results = get_query_results(query)
         for email_id, subdict in results.items():
-            print(extract_transaction_info(email_id, subdict, bill))
+            bill_info = extract_transaction_info(email_id, subdict, bill)
+
+            if bill_info and bill_info['date'] > last_run_date:
+                print(create_venmo_request(bill_info['bill_name'], bill_info['date'], bill_info['amount_to_be_charged']))
 
