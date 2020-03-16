@@ -78,7 +78,7 @@ def extract_electric_bill_info(email_id, message, bill_name, multiplier=0.5):
 
         return email_date, total_amount, amount_to_be_charged, bill_name 
     except:
-        print(f"Something went wrong with the parsing of email with ID {email_id}")
+        return None
 
 def extract_xfinity_bill_info(email_id, message, bill_name, multiplier=0.5):
 
@@ -96,7 +96,7 @@ def extract_xfinity_bill_info(email_id, message, bill_name, multiplier=0.5):
 
         return email_date, total_amount, amount_to_be_charged, bill_name 
     except:
-        print(f"Something went wrong with the parsing of email with ID {email_id}")
+        return None
 
 def extract_water_bill_info(email_id, message, bill_name, multiplier=0.5):
 
@@ -114,7 +114,7 @@ def extract_water_bill_info(email_id, message, bill_name, multiplier=0.5):
 
         return email_date, total_amount, amount_to_be_charged, bill_name 
     except:
-        print(f"Something went wrong with the parsing of email with ID {email_id}")
+        return None
 
 def extract_transaction_info(email_id, message, bill_name):
     '''
@@ -157,12 +157,13 @@ def extract_transaction_info(email_id, message, bill_name):
 
         return out
     except:
-        print(f'Error parsing email with ID = {email_id}')
+        #print(f'Error parsing email with ID = {email_id}')
+        return None
 
 def create_venmo_request(bill_name, date, amount_to_be_charged, chargee="@Emily-Solem"):
 
-    request_string = f"{bill_name} - {date.strftime('%Y-%m-%d')}"
-    venmo_CLI_string = f"venmo charge {chargee} {amount_to_be_charged} '{request_string}'"
+    request_string = f"{bill_name} bill - {date.strftime('%Y-%m-%d')}"
+    venmo_CLI_string = f"venmo charge {chargee} {amount_to_be_charged} '{request_string}'\n"
 
     return venmo_CLI_string
     
@@ -178,11 +179,23 @@ if __name__ == '__main__':
              'electric': electric_bill_query,
              'xfinity': xfinity_bill_query}
 
-    for bill, query in bills.items():
-        results = get_query_results(query)
-        for email_id, subdict in results.items():
-            bill_info = extract_transaction_info(email_id, subdict, bill)
+    with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
+        venmo_requests.write("#!/bin/bash\n\n")
 
-            if bill_info and bill_info['date'] > last_run_date:
-                print(create_venmo_request(bill_info['bill_name'], bill_info['date'], bill_info['amount_to_be_charged']))
+        for bill, query in bills.items():
+            results = get_query_results(query)
 
+            for email_id, subdict in results.items():
+                bill_info = extract_transaction_info(email_id, subdict, bill)
+
+                if bill_info and bill_info['date'] >= last_run_date:
+                    request_string = create_venmo_request(bill_info['bill_name'],
+                            bill_info['date'],
+                            bill_info['amount_to_be_charged'])
+
+                    venmo_requests.write(request_string)
+
+
+    with open("last_run_date.txt", 'w') as date_file:
+        today = dt.today()
+        date_file.write(str(today) + "\n")
