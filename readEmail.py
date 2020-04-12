@@ -168,6 +168,7 @@ def create_venmo_request(bill_name, date, amount_to_be_charged, chargee="@Emily-
     return venmo_CLI_string
     
 if __name__ == '__main__':
+
     with open("last_run_date.txt") as date_file:
         last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d")
 

@@ -32,3 +32,4 @@ how the email snippet is parsed. Is it worth...:
 
 * Had to reinstall and reconfigure venmo CLI credentials in order to fix 401
 error. Not sure if this will be a recurring issue.
+	* Had to do this TWICE in one day. Will this be an issue?
