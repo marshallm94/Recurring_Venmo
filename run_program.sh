@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get bills to request money for and create bash script
-python main.py
+python3 main.py
 
 # execute venmo requests
 source venmo_requests_to_make.sh >> last_run_logs.log
