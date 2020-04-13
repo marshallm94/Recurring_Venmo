@@ -4,7 +4,6 @@ from oauth2client import file, client, tools
 
 import base64
 import email
-from apiclient import errors
 
 from datetime import datetime as dt
 
