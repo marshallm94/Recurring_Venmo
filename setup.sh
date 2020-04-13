@@ -3,6 +3,7 @@
 # raspberry pi setup
 sudo apt-get -y install git
 sudo apt-get -y install python3-pip
+sudo apt-get -y install python3-numpy
 sudo apt-get -y install vim 
 
 pip3 install venmo

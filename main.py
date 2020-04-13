@@ -4,7 +4,8 @@ from EmailParser import EmailParser
 from Bill import Bill, bills
 
 with open("last_run_date.txt") as date_file:
-    last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d")
+    last_run_date = dt.strptime(date_file.readline().strip(),
+                                "%Y-%m-%d %H:%M:%S")
 
 
 with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
@@ -27,5 +28,5 @@ with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
 
 # should be last thing to execute
 with open("last_run_date.txt", 'w') as date_file:
-    today = dt.today()
+    today = dt.strftime(dt.today(), "%Y-%m-%d %H:%M:%S")
     date_file.write(str(today) + "\n")
