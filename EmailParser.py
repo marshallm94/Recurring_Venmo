@@ -60,7 +60,7 @@ class EmailParser(object):
         except:
             return None
 
-    def _get_query_results(self, self.query):
+    def _get_query_results(self):
         '''
         Get any messaages that match query from your Gmail account.
 
@@ -80,7 +80,7 @@ class EmailParser(object):
             message data.
         '''
         # Call the Gmail API to fetch INBOX
-        results = service.users().messages().list(userId='me',q=query).execute()
+        results = service.users().messages().list(userId='me',q=self.query).execute()
         messages = results.get('messages', [])
 
         out = {}
