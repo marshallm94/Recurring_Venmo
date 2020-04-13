@@ -7,7 +7,6 @@ import email
 from apiclient import errors
 
 from datetime import datetime as dt
-import numpy as np
 
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
 store = file.Storage('token.json')
@@ -34,7 +33,6 @@ class EmailParser(object):
 
             self.extract_bill_info(email_id, message_info)
 
-
     def extract_bill_info(self, message_info):
         '''
         Extracts all the important bill information from an email.
@@ -52,13 +50,13 @@ class EmailParser(object):
         try:
             start_idx = message['snippet'].find('$') + 1
             first_space_idx = message['snippet'][start_idx:-1].find(self.search_string)
-            total_amount = float(message['snippet'][start_idx:-1][:first_space_idx])
+            total = float(message['snippet'][start_idx:-1][:first_space_idx])
 
             # get date
             date_value = dt.fromtimestamp(int(subdict['internalDate'])/1000)
             email_date = date_value.strftime("%Y-%m-%d")
 
-            self.results.append({'date': email_date, 'total_amount': total_amount})
+            self.results.append({'date': email_date, 'total': total})
         except:
             return None
 

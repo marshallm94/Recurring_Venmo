@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# raspberry pi setup
 sudo apt-get -y install git
 sudo apt-get -y install python3-pip
 sudo apt-get -y install vim 

@@ -1,18 +1,7 @@
-from EmailParser import EmailParser 
-from Bill import Bill
+from datetime import datetime as dt
 
-bills = {'water': {'query': 'Metro Water Services AND new bill',
-                   'search_string': '. ',
-                   'chargee': '@Emily-Solem',
-                   'multiplier': 0.5},
-         'electric': {'query': 'from:NES subject:Payment Processed',
-                      'search_string': ' ',
-                      'chargee': '@Emily-Solem',
-                      'multiplier': 0.5},
-         'xfinity': {'query': 'from:Xfinity subject:Thank you for your recent payment',
-                     'search_string': ' ',
-                     'chargee': '@Emily-Solem',
-                     'multiplier': 0.5}}
+from EmailParser import EmailParser 
+from Bill import Bill, bills
 
 with open("last_run_date.txt") as date_file:
     last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d")
@@ -29,10 +18,11 @@ with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
         for bill_email in parser.results:
             bill = Bill(name = bill_name,
                         total = bill_email['total'],
+                        date = bill_email['date'],
                         multiplier = bill_info['multiplier'],
                         chargee = bill_info['chargee'])
 
-            if bill['date'] >= last_run_date:
+            if bill_email['date'] >= last_run_date:
                 venmo_requests.write(bill.request_string)
 
 # should be last thing to execute
