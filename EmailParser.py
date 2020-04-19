@@ -23,16 +23,18 @@ class EmailParser(object):
         self.search_string = search_string
         self.query_matches = None
         self.results = []
+        self.main()
 
     def main(self):
 
+        self._get_query_results()
         # although there only "should" be one match, using a loop should catch
         # any edge cases where there is more than one bill.
         for email_id, message_info in self.query_matches.items():
 
-            self.extract_bill_info(email_id, message_info)
+            self.extract_bill_info(message_info)
 
-    def extract_bill_info(self, message_info):
+    def extract_bill_info(self, message):
         '''
         Extracts all the important bill information from an email.
 
@@ -47,17 +49,18 @@ class EmailParser(object):
         None
         '''
         try:
+            # get total bill amount
             start_idx = message['snippet'].find('$') + 1
             first_space_idx = message['snippet'][start_idx:-1].find(self.search_string)
             total = float(message['snippet'][start_idx:-1][:first_space_idx])
 
             # get date
-            date_value = dt.fromtimestamp(int(subdict['internalDate'])/1000)
-            email_date = date_value.strftime("%Y-%m-%d")
+            date_value = dt.fromtimestamp(int(message['internalDate'])/1000)
 
-            self.results.append({'date': email_date, 'total': total})
-        except:
-            return None
+            self.results.append({'date': date_value, 'total': total})
+        except ValueError:
+            print("Error parsing email with specified search string.")
+
 
     def _get_query_results(self):
         '''
