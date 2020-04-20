@@ -4,17 +4,17 @@ Use Venmo CLI and Gmail API to read recurring shared charges and request money.
 
 # Musings
 
-* The current implementation has the following psuedo-structure:
+* The current implementation has the following pseudo-structure:
 
 ```
-For all monthly bills:
-    find all emails that match the specified string:
-        for all emails that match the specified string:
-	    if the date of the email is later than the last run date:
-	        create the venmo request
+# For all monthly bills:
+    # find all emails that match the specified string:
+        # for all emails that match the specified string:
+	    # if the date of the email is later than the last run date:
+	        # create the venmo request
 ```
 
-When this is written out in a more psuedo-code style:
+When this is written out in a more pseudo-code style:
 
 ```python
 # for bill in bill dictionary:
