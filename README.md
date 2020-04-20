@@ -1,35 +1,53 @@
-# Recurrin\_Venmo
-Use Venmo CLI and Gmail API (?) to read recurring shared charges and request money.
+# Recurring\_Venmo
 
-# Notes/TODO:
+Use Venmo CLI and Gmail API to read recurring shared charges and request money.
 
-* In terms of keeping track of the most recent date the program was run,
-would it make sense to write a text file to the file system at the absolute
-end of execution? This could then be read in at the start of the program, and
-used in the following psuedo-code way:
+# Musings
 
-```python
-if date_of_bill is before date_read_in_from_text_file:
-	# don't charge twice for same thing.
-	pass
+* The current implementation has the following psuedo-structure:
+
+```
+For all monthly bills:
+    find all emails that match the specified string:
+        for all emails that match the specified string:
+	    if the date of the email is later than the last run date:
+	        create the venmo request
 ```
 
-* At which level of the "problem hierarchy tree" should exceptions be handled??
+When this is written out in a more psuedo-code style:
 
-* Separate setup logic into separate, appriopriately named file (so there is one
-'main.py' whose structure easily maps onto the problem structure).
+```python
+# for bill in bill dictionary:
+    # create EmailParser() instance
+    # find all emails that match the specified string 
 
-* If no charges are made, have a log that says "No new charges registered since
-last run".
+    # for all emails that match the specified string:
+	# create Bill() instance
+	# if the date of the email is later than the last run date:
+	    # create the venmo request
+```
 
-* Current implementation has the parsing of an email snippet separated into one
-function per bill/montly payment. The only difference between these functions is
-how the email snippet is parsed. Is it worth...:
-	* Combining all the functionality into one function and separating the
-	different parsing mechanisms using `if/else` clauses?
-	* Creaing a meta-class that handles most of the logic, and create a sub-class
-	for each bill/email that needs a separate parsing scheme?
+However this algorithm isn't the most efficient; since only some of the
+emails that match the specified string will be later than the last run date
+(call this set of emails M, which is a subset of N, all emails that matched
+the specified string), there will be N - M `Bill()` instantiations, including
+all the computation that goes along with a `Bill()` instantiation, that happens
+unnecessarily.
 
-* Had to reinstall and reconfigure venmo CLI credentials in order to fix 401
-error. Not sure if this will be a recurring issue.
-	* Had to do this TWICE in one day. Will this be an issue?
+By checking if the email date is later than the last run date prior to the `Bill()`
+instantiation, this inefficiency is removed:
+
+```python
+# for bill in bill dictionary:
+    # create EmailParser() instance
+    # find all emails that match the specified string 
+
+    # for all emails that match the specified string:
+    # if the date of the email is later than the last run date:
+        # create Bill() instance
+        # create the venmo request
+```
+
+# TODO
+
+* At which level of the "problem hierarchy" should exceptions be handled??
