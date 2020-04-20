@@ -16,7 +16,7 @@ Use Venmo CLI and Gmail API to read recurring shared charges and request money.
 
 When this is written out in a more pseudo-code style:
 
-```python
+```
 # for bill in bill dictionary:
     # create EmailParser() instance
     # find all emails that match the specified string 
@@ -37,7 +37,7 @@ unnecessarily.
 By checking if the email date is later than the last run date prior to the `Bill()`
 instantiation, this inefficiency is removed:
 
-```python
+```
 # for bill in bill dictionary:
     # create EmailParser() instance
     # find all emails that match the specified string 
