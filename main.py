@@ -16,14 +16,15 @@ with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
                              search_string = bill_info['search_string'])
 
         for bill_email in parser.results:
-            bill = Bill(name = bill_name,
-                        total = bill_email['total'],
-                        date = bill_email['date'],
-                        multiplier = bill_info['multiplier'],
-                        chargee = bill_info['chargee'])
-
             if bill_email['date'] >= last_run_date:
+                bill = Bill(name = bill_name,
+                            total = bill_email['total'],
+                            date = bill_email['date'],
+                            multiplier = bill_info['multiplier'],
+                            chargee = bill_info['chargee'])
+
                 venmo_requests.write(bill.request_string)
+
 
 # should be last thing to execute
 with open("last_run_date.txt", 'w') as date_file:

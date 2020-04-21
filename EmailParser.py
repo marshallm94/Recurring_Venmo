@@ -21,15 +21,15 @@ class EmailParser(object):
 
         self.query = query
         self.search_string = search_string
-        self.query_matches = None
+        self.query_matches = self._get_query_results() 
         self.results = []
         self.main()
 
     def main(self):
 
-        self._get_query_results()
-        # although there only "should" be one match, using a loop should catch
-        # any edge cases where there is more than one bill.
+        # TODO: is it worth passing the email_id to self.extract_bill_info()
+        # as a means of identifying which messages weren't able to parse
+        # (i.e. exception handling)?
         for email_id, message_info in self.query_matches.items():
 
             self.extract_bill_info(message_info)
@@ -41,30 +41,31 @@ class EmailParser(object):
         Parameters:
         ----------
         message : (dict)
-            A dictionary that contains the a key 'snippet' whose value contains
+            A dictionary that contains the key 'snippet' whose value contains
             all relevant transaction information (date, amount, bill_name).
 
         Returns:
         ----------
-        None
+        None (appends small dictionary to self.results with keys 'date' and
+        'total')
         '''
         try:
+            # get date
+            date_value = dt.fromtimestamp(int(message['internalDate'])/1000)
+
             # get total bill amount
             start_idx = message['snippet'].find('$') + 1
             first_space_idx = message['snippet'][start_idx:-1].find(self.search_string)
             total = float(message['snippet'][start_idx:-1][:first_space_idx])
-
-            # get date
-            date_value = dt.fromtimestamp(int(message['internalDate'])/1000)
 
             self.results.append({'date': date_value, 'total': total})
         except ValueError:
             print("Error parsing email with specified search string.")
 
 
-    def _get_query_results(self):
+    def _get_query_results(self, query = None):
         '''
-        Get any messaages that match query from your Gmail account.
+        Get any messaages that match self.query from your Gmail account.
 
         Parameters:
         ----------
@@ -76,16 +77,19 @@ class EmailParser(object):
 
         Returns:
         ----------
-        out : (dict)
+        message_dict : (dict)
             A "dict of dict's," the keys being the massage ID's of messages that
             matched the query, the values being dictionaries containing additional
             message data.
         '''
+        if not query:
+            query = self.query
+
         # Call the Gmail API to fetch INBOX
-        results = service.users().messages().list(userId='me',q=self.query).execute()
+        results = service.users().messages().list(userId='me', q=query).execute()
         messages = results.get('messages', [])
 
-        out = {}
+        message_dict = {}
         for message in messages:
             # msg is a dict
             msg = service.users().messages().get(userId='me',id=message['id'],format='raw').execute()
@@ -93,7 +97,7 @@ class EmailParser(object):
             # removing ID since it will be used as the key for the returned
             # dictionary - adhering to DRY
             del msg['id']
-            out[message['id']] = msg
+            message_dict[message['id']] = msg
 
             msg_str = base64.urlsafe_b64decode(msg['raw'].encode('ASCII'))
             mime_msg = email.message_from_bytes(msg_str)
@@ -102,6 +106,6 @@ class EmailParser(object):
                 if part.get_content_type() == 'text/plain':
                     email_text += part.get_payload()
 
-            out[message['id']]['email_text'] = email_text
+            message_dict[message['id']]['email_text'] = email_text
 
-        self.query_matches = out
+        return message_dict
