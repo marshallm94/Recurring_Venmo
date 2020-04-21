@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# raspberry pi setup
+# raspberry pi related installations 
 sudo apt-get -y install git
 sudo apt-get -y install python3-pip
 sudo apt-get -y install python3-numpy
 sudo apt-get -y install vim 
 
+# program related installations
 pip3 install venmo
 pip3 install httplib2
 pip3 install oauth2client

@@ -1,6 +1,20 @@
 # Recurring\_Venmo
 
-Use Venmo CLI and Gmail API to read recurring shared charges and request money.
+Use Venmo CLI and Gmail API to create and request recurring monthly charges.
+
+# Setup
+
+`token.json` and `credentials.json` are the two files that
+[EmailParser.py](EmailParser.py) needs in order to run. These can be obtained
+using [Google's Cloud Platform](https://console.developers.google.com/apis/dashboard?project=recurring-venmo)
+
+The [setup.sh](setup.sh) file includes all the installations necessary for
+this program (in addition to some installations on a raspberry pi).
+
+If you would like to manually run this at whatever time interval you like, 
+simply run `bash run_program.sh` from the CL. Alternatively, this could be setup
+to run at a specified interval using crontab (which is how it is currently setup
+on previously mentioned raspberry pi).
 
 # Algorithmic Musings
 
