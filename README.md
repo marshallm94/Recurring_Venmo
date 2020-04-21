@@ -33,7 +33,7 @@ for this problem, this becomes:
 However this algorithm isn't the most efficient; since only some of the
 emails that match the specified string will be later than the last run date
 (call this set of emails M, which is a subset of N, all emails that matched
-the specified string), there will be N - M `Bill()` unnecessary instantiations.
+the specified string), there will be N - M unnecessary `Bill()` instantiations.
 
 By checking if the email date is later than the last run date prior to the `Bill()`
 instantiation, this inefficiency is removed:
