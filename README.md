@@ -16,6 +16,18 @@ simply run `bash run_program.sh` from the CL. Alternatively, this could be setup
 to run at a specified interval using crontab (which is how it is currently setup
 on previously mentioned raspberry pi).
 
+**If the requests do not complete,** but every other part of the program runs
+properly, check `request_logs.log`. If the last line of the traceback is:
+
+```
+  users = response.json()['data']
+KeyError: 'data'
+```
+
+...then the credentials for the venmo package have timed out. You will need to
+reconfigure by running `venmo configure` at the command line. See
+[this issue](https://github.com/zackhsi/venmo/issues/57) for more information.
+
 # Algorithmic Musings
 
 ## 1
