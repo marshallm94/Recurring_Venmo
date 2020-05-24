@@ -23,7 +23,7 @@ class Bill(object):
     def _get_venmo_path(filepath = '.venmo_path.txt'):
 
         with open(filepath, 'r') as tmp:
-            out = tmp.readline()
+            out = tmp.readline().strip()
         return out
 
 
