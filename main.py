@@ -6,6 +6,8 @@ from Bill import Bill, bills
 with open(".last_run_date.txt") as date_file:
     last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d %H:%M:%S")
 
+with open(".venmo_file.txt") as venmo_command_file::
+    venmo_command = venmo_command_file.readline()
 
 with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
 
@@ -21,7 +23,8 @@ with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
                             total = bill_email['total'],
                             date = bill_email['date'],
                             multiplier = bill_info['multiplier'],
-                            chargee = bill_info['chargee'])
+                            chargee = bill_info['chargee'],
+                            venmo_command = venmo_command)
 
                 venmo_requests.write(bill.request_string)
 
