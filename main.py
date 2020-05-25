@@ -7,7 +7,7 @@ with open(".last_run_date.txt") as date_file:
     last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d %H:%M:%S")
 
 with open(".venmo_path.txt") as venmo_command_file:
-    venmo_command = venmo_command_file.readline()
+    venmo_command = venmo_command_file.readline().strip()
 
 with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
 
