@@ -12,5 +12,5 @@ python3 main.py 2> $log_dir/main_errors.log > $log_dir/main_logs.log \
 # execute venmo requests -
 # In english: "Run venmo_requests_to_make.sh and pipe and errors to request_errors.log
 # and any output to venmo_logs.log. If venmo_requests_to_make.sh succeeds, delete the file."
-bash venmo_requests_to_make.sh 2> $log_dir/request_errors.log > $log_dir/venmo_logs.log \
+bash venmo_requests_to_make.sh 2> $log_dir/venmo_errors.log > $log_dir/venmo_logs.log \
 	&& rm venmo_requests_to_make.sh
