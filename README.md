@@ -2,6 +2,9 @@
 
 Use Venmo CLI and Gmail API to create and request recurring monthly charges.
 
+For a look at some of the takeaways I thought about during this micro-project,
+check out [things_I_learned.md](things_I_learned.md)
+
 # Setup
 
 `token.json` and `credentials.json` are the two files that
@@ -27,6 +30,7 @@ KeyError: 'data'
 ...then the credentials for the venmo package have timed out. You will need to
 reconfigure by running `venmo configure` at the command line. See
 [this issue](https://github.com/zackhsi/venmo/issues/57) for more information.
+**At the time of the writing, there is no way around the credientials timing out.**
 
 # TODO
 
