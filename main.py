@@ -23,10 +23,9 @@ with open('venmo_requests_to_make.sh', 'w') as venmo_requests:
                             total = bill_email['total'],
                             date = bill_email['date'],
                             multiplier = bill_info['multiplier'],
-                            chargee = bill_info['chargee'],
-                            venmo_command = venmo_command)
+                            chargee = bill_info['chargee'])
 
-                venmo_requests.write(bill.request_string)
+                venmo_requests.write(bill.create_venmo_request(venmo_command))
 
 
 # should be last thing to execute

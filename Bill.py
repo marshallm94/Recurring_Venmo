@@ -15,20 +15,18 @@ bills = {'water': {'query': 'Metro Water Services AND new bill',
 
 class Bill(object):
 
-    def __init__(self, name, total, date, multiplier, chargee, venmo_command):
+    def __init__(self, name, total, date, multiplier, chargee):
 
         self.name = name
         self.multiplier = multiplier
         self.chargee = chargee
         self.total = total
         self.date = date
-        self.venmo_command = venmo_command
         self.amount_to_be_charged = np.round(self.total * self.multiplier, 2)
-        self.request_string = self.create_venmo_request()
 
-    def create_venmo_request(self):
+    def create_venmo_request(self, venmo_command):
 
         request_string = f"{self.name} bill - {self.date.strftime('%Y-%m-%d')}"
-        venmo_CLI_string = f"{self.venmo_command} charge {self.chargee} {self.amount_to_be_charged} '{request_string}'\n"
+        venmo_CLI_string = f"{venmo_command} charge {self.chargee} {self.amount_to_be_charged} '{request_string}'\n"
 
         return venmo_CLI_string
