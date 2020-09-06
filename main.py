@@ -38,6 +38,6 @@ with open('output.log', 'w') as venmo_requests:
 
 
 # should be last thing to execute
-# with open(".last_run_date.txt", 'w') as date_file:
-#     today = dt.strftime(dt.today(), "%Y-%m-%d %H:%M:%S")
-#     date_file.write(str(today) + "\n")
+with open(".last_run_date.txt", 'w') as date_file:
+    today = dt.strftime(dt.today(), "%Y-%m-%d %H:%M:%S")
+    date_file.write(str(today) + "\n")

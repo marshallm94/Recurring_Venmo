@@ -1,6 +1,7 @@
 # Recurring\_Venmo
 
-Use Venmo CLI and Gmail API to create and request recurring monthly charges.
+Use [textbelt](https://github.com/typpo/textbelt) and Gmail API to identify
+recurring monthly charges and send myself a text to request money.
 
 For a look at some of the takeaways I thought about during this micro-project,
 check out [things_I_learned.md](things_I_learned.md)
@@ -19,18 +20,12 @@ simply run `bash run_program.sh` from the CL. Alternatively, this could be setup
 to run at a specified interval using crontab (which is how it is currently setup
 on previously mentioned raspberry pi).
 
-**If the requests do not complete,** but every other part of the program runs
-properly, check `request_logs.log`. If the last line of the traceback is:
+## Textbelt Setup
 
-```
-  users = response.json()['data']
-KeyError: 'data'
-```
-
-...then the credentials for the venmo package have timed out. You will need to
-reconfigure by running `venmo configure` at the command line. See
-[this issue](https://github.com/zackhsi/venmo/issues/57) for more information.
-**At the time of the writing, there is no way around the credientials timing out.**
+I set up an API key with Textbelt (not tracked via Git for obvious reasons - this
+must be `scp`'d to the Raspberry Pi) and whenever the number of texts I have
+remaining (`resp.json()['quotaRemaining']`) reaches 0, my card will be charged
+(since this is setup to only run monthly I don't expect this to be a huge expense).
 
 # TODO
 
@@ -38,4 +33,5 @@ reconfigure by running `venmo configure` at the command line. See
 isn't very descriptive; it is simply `print("Error parsing email with specified search string.")`.
 Should there be more information in this error message? email ID? Date? (This 
 currently only happens for old emails that are prior to the last run date, so it
-isn't "really" a problem.)
+isn't "really" a problem...then again I'm sure everyone says that until it
+bites them in the ass...)
