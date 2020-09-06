@@ -7,7 +7,7 @@ from Bill import Bill, bills
 with open(".last_run_date.txt") as date_file:
     last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d %H:%M:%S")
 
-with open('textbelt_api_key.txt') as key:
+with open('.textbelt_api_key.txt') as key:
     api_key = key.readline().strip()
 
 with open('output.log', 'w') as venmo_requests:
