@@ -24,6 +24,12 @@ class Bill(object):
         self.date = date
         self.amount_to_be_charged = np.round(self.total * self.multiplier, 2)
 
+    def __str__(self):
+
+        info_string = f"{self.name} bill | {self.date.strftime('%Y-%m-%d')} | {self.amount_to_be_charged}"
+
+        return info_string
+
     def create_venmo_request(self, venmo_command):
 
         request_string = f"{self.name} bill - {self.date.strftime('%Y-%m-%d')}"
