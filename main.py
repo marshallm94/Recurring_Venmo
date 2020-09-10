@@ -1,4 +1,6 @@
+import os
 import requests
+import json
 from datetime import datetime as dt
 
 from EmailParser import EmailParser 
@@ -10,32 +12,46 @@ with open(".last_run_date.txt") as date_file:
 with open('.textbelt_api_key.txt') as key:
     api_key = key.readline().strip()
 
-with open('output.log', 'w') as venmo_requests:
+full_text_body = ""
+full_charge_amount = 0
+for bill_name, bill_info in bills.items():
+    parser = EmailParser(query = bill_info['query'],
+                         search_string = bill_info['search_string'])
 
-    full_text_body = ""
-    full_charge_amount = 0
-    for bill_name, bill_info in bills.items():
-        parser = EmailParser(query = bill_info['query'],
-                             search_string = bill_info['search_string'])
+    for bill_email in parser.results:
+        if bill_email['date'] >= last_run_date:
+            bill = Bill(name = bill_name,
+                        total = bill_email['total'],
+                        date = bill_email['date'],
+                        multiplier = bill_info['multiplier'])
 
-        for bill_email in parser.results:
-            if bill_email['date'] >= last_run_date:
-                bill = Bill(name = bill_name,
-                            total = bill_email['total'],
-                            date = bill_email['date'],
-                            multiplier = bill_info['multiplier'],
-                            chargee = bill_info['chargee'])
+            full_text_body += str(bill) + "\n"
+            full_charge_amount += bill.amount_to_be_charged
 
-                full_text_body += str(bill) + "\n"
-                full_charge_amount += bill.amount_to_be_charged
+full_text_body += f"\nTotal = {round( full_charge_amount, 2 )}\n"
 
-    full_text_body += f"\nTotal = {full_charge_amount}\n"
+request_dict = {'phone': '3038106250', 'message': full_text_body, 'key': api_key}
+resp = requests.post('https://textbelt.com/text/', request_dict)
 
-    request_dict = {'phone': '3038106250', 'message': full_text_body, 'key': api_key}
-    resp = requests.post('https://textbelt.com/text/', request_dict)
+log_info = {
+        'run_date': dt.strftime(dt.today(), "%Y-%m-%d %H:%M:%S"),
+        'last_run_date': dt.strftime(last_run_date, "%Y-%m-%d %H:%M:%S"),
+        'textbelt_response': resp.json(),
+        'text': full_text_body
+}
 
-    log_info = resp.json()
 
+LOG_FILE = 'logs.json'
+if os.path.exists(LOG_FILE):
+    with open(LOG_FILE) as log_file:
+        old_logs = json.load(log_file)
+        old_logs.update(log_info)
+    with open(LOG_FILE,'w') as log_file:
+        json.dump(old_logs, log_file, indent = 4)
+
+elif os.path.exists(LOG_FILE) == False:
+    with open(LOG_FILE, 'w') as log_file:
+        json.dump(log_info, log_file, indent = 4)
 
 # should be last thing to execute
 with open(".last_run_date.txt", 'w') as date_file:
