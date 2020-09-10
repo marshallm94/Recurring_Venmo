@@ -29,6 +29,11 @@ remaining (`resp.json()['quotaRemaining']`) reaches 0, my card will be charged
 
 # TODO
 
+* The current implementation is 'once-removed' from the problem; reading email
+to determine what charges were made. Ideally, my bank has an API that would let
+me access the information in my account, and then I could actually just look at
+the charges that have been made that way.
+* Only update the `.last_run_date.txt` file if the text is successfully sent.
 * The current exception that is thrown if there is an error parsing an email
 isn't very descriptive; it is simply `print("Error parsing email with specified search string.")`.
 Should there be more information in this error message? email ID? Date? (This 
