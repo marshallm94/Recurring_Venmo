@@ -1,7 +1,32 @@
 A semi-organized collection of thoughts/musings that occurred as I went through
 (and continue to go through) the development process.
 
-# A Balancing Act - Conceptual Ideals and Pragmatic Solutions
+[TOC]
+
+# Release 2.0
+
+With the change to textbelt, the problem schematic changes a little bit, shown
+below; `bash` has been taken out of the equation since the `requests` Python
+module can send POST requests easily. Additionally, `main.py` isn't quite as cut
+and dry as it was. There are now three conceptual parts:
+
+1. Create text message of charges to make.
+2. Send that text to myself.
+3. Log the response JSON and other info.
+
+One could make the argument that these could be put into functions, and then those
+functions would be put into a `if __name__ == "__main__":` block. However, then
+the user just has to go up and read what is happening in the functions anyway...
+
+**Takeaway: You can refactor your code as much as you want to make it human
+readable, but the human reader is going to have to put some effort into understanding
+the problem no matter what.**
+
+![](problem_view_2p0.png)
+
+# Release 1.0
+
+## A Balancing Act - Conceptual Ideals and Pragmatic Solutions
 
 In my ideal world, [main.py](main.py) would be written in a way that maps onto
 the problem it is trying to solve perfectly - to the point that someone who
@@ -15,7 +40,7 @@ follows a more "depth-first" approach to problem-solving as opposed to a "breadt
 solution. Taken to the extreme (in my opinion), the "breadth-first" would have
 all the code in one file; everything that is currently in [Bill.py](Bill.py) would
 be put into [main.py](main.py), and what is currently in [main.py](main.py) would
-be moved into an `if __name__ == "__main__":` block. Additionaly, one would then
+be moved into an `if __name__ == "__main__":` block. Additionally, one would then
 have to decide "Should I even write the actual venmo command to a separate file,
 or would it be better to call the command line command from within Python. Then
 again, if I'm doing that, any error handling should probably be kept within
@@ -31,14 +56,14 @@ complete; a more methodical approach would be to create this map first, with as
 much detail as one could, and then start programming from there, making adjustments
 as needed.
 
-# Algorithmic Musings
+## Algorithmic Musings
 
-## 1
+### 1
 
 The first implementation had the following pseudo-structure:
 
 ```
-# For all monthly bills:
+## For all monthly bills:
     # find all emails that match the specified string:
         # for all emails that match the specified string:
 	    # if the date of the email is later than the last run date:
@@ -49,7 +74,7 @@ When this is written out in a more pseudo-code style, using the classes written
 for this problem, this becomes:
 
 ```
-# for bill in bill dictionary:
+## for bill in bill dictionary:
     # create EmailParser() instance
     # find all emails that match the specified string 
 
@@ -68,7 +93,7 @@ By checking if the email date is later than the last run date prior to the `Bill
 instantiation, this inefficiency is removed:
 
 ```
-# for bill in bill dictionary:
+## for bill in bill dictionary:
     # create EmailParser() instance
     # find all emails that match the specified string 
 
@@ -78,7 +103,7 @@ instantiation, this inefficiency is removed:
         # create the venmo request
 ```
 
-## 2
+### 2
 
 There could be a case to be made that once the date of the email is identified,
 if that date is prior to the last run date, then no more computation should be
@@ -92,7 +117,7 @@ of OOP, *Encapsulation.* Since the ideal is to group **logically related** types
 variables and methods, a variable that isn't related to the concept that the
 `EmailParser()` class is made for shouldn't be included in said class.
 
-## 3
+### 3
 
 A previous iteration had the `venmo_command` being passed into the `Bill` constructor,
 and saved as `self.venmo_command`. The `create_venmo_request()` method
@@ -127,7 +152,7 @@ the set of concepts that are within "solution domain", whereas the concept of a
 Bill is part of the "problem domain," regardless of how the problem is actually
 solved.
 
-# Differences when Developing with the Cron as the End Goal
+## Differences when Developing with the Cron as the End Goal
 
 When scheduling a task to run using cron, it is important to keep in mind that
 the user's `.bashrc`, `.bash_profile`, etc. will not be loaded, and therefore
