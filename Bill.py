@@ -1,14 +1,5 @@
 import numpy as np
 
-bills = {'water': {'query': 'Metro Water Services AND new bill',
-                   'search_string': '. ',
-                   'multiplier': 0.5},
-         'electric': {'query': 'from:NES subject:Payment Processed',
-                      'search_string': ' ',
-                      'multiplier': 0.5},
-         'xfinity': {'query': 'from:Xfinity subject:Thank you for your recent payment',
-                     'search_string': ' ',
-                     'multiplier': 0.5}}
 
 class Bill(object):
 

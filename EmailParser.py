@@ -17,10 +17,9 @@ service = build('gmail', 'v1', http=creds.authorize(Http()))
 
 class EmailParser(object):
 
-    def __init__(self, query, search_string):
+    def __init__(self, query):
 
         self.query = query
-        self.search_string = search_string
         self.query_matches = self._get_query_results() 
         self.results = []
         self.main()
@@ -53,12 +52,14 @@ class EmailParser(object):
             # get date
             date_value = dt.fromtimestamp(int(message['internalDate'])/1000)
 
-            # get total bill amount
-            start_idx = message['snippet'].find('$') + 1
-            first_space_idx = message['snippet'][start_idx:-1].find(self.search_string)
-            total = float(message['snippet'][start_idx:-1][:first_space_idx])
+            # get one-time passcode
+            search_thing = 'your one-time passcode is '
+            start_idx = message['snippet'].find(search_thing)
+            end_idx = message['snippet'].find(' Once')
+            sentence = message['snippet'][start_idx:end_idx]
+            passcode = int( sentence[len(sentence)-7:-1] )
 
-            self.results.append({'date': date_value, 'total': total})
+            self.results.append({'date': date_value, 'passcode': passcode})
         except ValueError:
             print("Error parsing email with specified search string.")
 

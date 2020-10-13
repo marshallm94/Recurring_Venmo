@@ -1,3 +1,5 @@
 .credentials.json
 .token.json
 .textbelt_api_key.txt
+.bank_info.json
+.bill_info.json
