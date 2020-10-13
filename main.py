@@ -35,7 +35,7 @@ with open(BANK_INFO) as bank_file:
 with open(MONTHLY_BILL_INFO) as bill_file:
     monthly_charge_data = json.load(bill_file)
 
-with Browser() as browser:
+with Browser(headless=True) as browser:
     # Visit URL
     url = "https://www.elevationscu.com"
     browser.visit(url)
