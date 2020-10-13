@@ -3,7 +3,7 @@ import time
 from splinter import Browser
 from datetime import datetime as dt
 
-from EmailParser_2 import EmailParser 
+from EmailParser import EmailParser 
 from Bill import Bill
 
 BANK_INFO = '.bank_info.json'
@@ -23,6 +23,12 @@ def get_transaction_info(search_value,
 
     return date, description, amount
 
+with open(".last_run_date.txt") as date_file:
+    last_run_date = dt.strptime(date_file.readline().strip(), "%Y-%m-%d %H:%M:%S")
+
+with open('.textbelt_api_key.txt') as key:
+    api_key = key.readline().strip()
+
 with open(BANK_INFO) as bank_file:
     bank_login_info = json.load(bank_file)
 
@@ -38,12 +44,11 @@ with Browser() as browser:
     login_btn = browser.find_by_xpath(login_btn_xpath)
     login_btn.click()
 
-    # input login info
+    # login
     usr_name_xpath = '//*[@id="field-personal-userid-input"]'
     browser.find_by_xpath(usr_name_xpath).fill(bank_login_info['username'])
     usr_name_xpath = '//*[@id="field-personal-password-input"]'
     browser.find_by_xpath(usr_name_xpath).fill(bank_login_info['password'])
-
     login_btn_xpath = "/html/body/div[1]/div[1]/main/div/div/div/div/div[2]/div[1]/form/button/span"
     login_btn = browser.find_by_xpath(login_btn_xpath)
     login_btn.click()
@@ -65,7 +70,6 @@ with Browser() as browser:
         register_device_btn = browser.find_by_xpath(register_device_xpath)
         register_device_btn.click()
 
-    time.sleep(10)
     checking_acct_xpath = '//*[@id="accountNameugtEG2lluVkfVc8vahCfrVDyTGH8GZAKo6puiy0IfFg"]'
     checking_acct_btn = browser.find_by_xpath(checking_acct_xpath, wait_time=10)
     checking_acct_btn.click()
@@ -86,7 +90,6 @@ with Browser() as browser:
 
 
     full_text_body += f"\nTotal = {round( full_charge_amount, 2 )}\n"
-    print(full_text_body)
 
 request_dict = {'phone': '3038106250', 'message': full_text_body, 'key': api_key}
 resp = requests.post('https://textbelt.com/text/', request_dict)
